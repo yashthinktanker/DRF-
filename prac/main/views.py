@@ -190,10 +190,18 @@ class brandpage(ListAPIView):
 
 
 # ---------------- Insta User ADd ------------------
-
+from django.db.models import Q
 class Instauserview(viewsets.ModelViewSet):
-    queryset = InstaUser.objects.all()
     serializer_class = InstaUserSerializer
+    def  get_queryset(self):
+        username = self.request.session.get('username')
+
+        # if username:
+        #     return InstaUser.objects.filter(is_private=False)
+        if username:
+            return InstaUser.objects.filter(Q(is_private=False) | Q(username=username))
+
+        return InstaUser.objects.none()
 
 class InstaPostview(viewsets.ModelViewSet):
     queryset = InstaPost.objects.all()
@@ -202,7 +210,6 @@ class InstaPostview(viewsets.ModelViewSet):
 # class InstaPostLikeview(viewsets.ModelViewSet):
 #     queryset = InstaLike.objects.all()
 #     serializer_class = InstaPostLikeSerializer
-
 
 # --------- ALL data deleted -----------
 from rest_framework.decorators import action
@@ -217,3 +224,34 @@ class InstaPostLikeview(viewsets.ModelViewSet):
         return Response ({
             'message':f'all data is delete{c}'
         })
+    
+
+class LoginView(viewsets.ViewSet):
+
+    def create(self, request):
+        username = request.data.get("username")
+        password = request.data.get("password")
+
+        try:
+            user = InstaUser.objects.get(username=username)
+        except InstaUser.DoesNotExist:
+            return Response({"error": "Invalid Username"})
+
+        if user.password == password:
+            request.session['username']=user.username
+            return Response({
+                "message": "Login successful",
+                "user_id": user.id
+            })
+        else:
+            return Response({"error": "Invalid Password"})
+
+
+
+class LogoutView(viewsets.ViewSet):
+      def create(self, request):
+        if request.session.get('username'):
+            del request.session['username']
+            return Response({"message": "Logout successful"})
+        else:
+            return Response({"message": "pls Login"})
