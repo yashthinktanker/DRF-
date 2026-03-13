@@ -9,3 +9,7 @@ admin.site.register(InstaUser)
 
 admin.site.register(InstaPost)
 
+admin.site.register(InstaLike)
+
+
+

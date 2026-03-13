@@ -33,6 +33,7 @@ class InstaUser(models.Model):
 
     is_verified = models.BooleanField(default=False)
     is_private = models.BooleanField(default=False)
+    password = models.CharField(max_length=50,default='')
 
     def __str__(self):
         return self.username
