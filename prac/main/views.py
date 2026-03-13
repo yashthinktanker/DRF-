@@ -145,8 +145,8 @@ class Model_nameV(viewsets.ModelViewSet):
     # permission_classes = [AllowAny]
     # permission_classes = [IsAdminUser]
     # permission_classes = [IsAuthenticated]
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    throttle_classes = [AnonRateThrottle,UserRateThrottle]
+    # permission_classes = [IsAuthenticatedOrReadOnly]
+    # throttle_classes = [AnonRateThrottle,UserRateThrottle]
 
 # ----------- JWT Authentication ----------- 
 
@@ -187,3 +187,33 @@ class brandpage(ListAPIView):
 #     queryset=Model_name.objects.all()
 #     serializer_class = Model_nameserializers
 #     throttle_classes = [AnonRateThrottle,UserRateThrottle]
+
+
+# ---------------- Insta User ADd ------------------
+
+class Instauserview(viewsets.ModelViewSet):
+    queryset = InstaUser.objects.all()
+    serializer_class = InstaUserSerializer
+
+class InstaPostview(viewsets.ModelViewSet):
+    queryset = InstaPost.objects.all()
+    serializer_class = InstaPostSerializer
+
+# class InstaPostLikeview(viewsets.ModelViewSet):
+#     queryset = InstaLike.objects.all()
+#     serializer_class = InstaPostLikeSerializer
+
+
+# --------- ALL data deleted -----------
+from rest_framework.decorators import action
+
+class InstaPostLikeview(viewsets.ModelViewSet):
+    queryset = InstaLike.objects.all()
+    serializer_class = InstaPostLikeSerializer
+
+    @action(detail=False, methods=['delete'])
+    def delete_all(self,request):
+        c=InstaLike.objects.all().delete()
+        return Response ({
+            'message':f'all data is delete{c}'
+        })
