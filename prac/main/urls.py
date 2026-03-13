@@ -11,6 +11,12 @@ router.register('model_name',views.Model_nameV,basename='model_name')
 
 router.register('jwtgetmodel_name',views.jwtgetmodel_name,basename='jwtgetmodel_name')
 
+# Instagram
+router.register('Instauserview',views.Instauserview,basename='Instauserview')
+router.register('InstaPostview',views.InstaPostview,basename='InstaPostview')
+router.register('InstaPostLikeview',views.InstaPostLikeview,basename='InstaPostLikeview')
+
+
 
 urlpatterns = [
     path('',include(router.urls)),
