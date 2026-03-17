@@ -1,8 +1,24 @@
 from django.db import models
 
 
+class Nonedeleted(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_delete=False)
+class SoftDelete(models.Model):
+    is_delete = models.BooleanField(default=False)
 
-class Brand(models.Model):
+    everithing = models.Manager()
+    objects = Nonedeleted()
+    def soft_delete(self):
+        self.is_delete = True
+    
+    def restore(self):
+        self.is_delete = False
+
+    class Meta:
+        abstract = True
+
+class Brand(SoftDelete):
     name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -22,6 +38,7 @@ class Model_name(models.Model):
 class InstaUser(models.Model):
     username = models.CharField(max_length=150, unique=True)
     full_name = models.CharField(max_length=255, blank=True, null=True)
+    email = models.EmailField()
     bio = models.TextField(blank=True, null=True)
 
 

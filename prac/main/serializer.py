@@ -24,7 +24,9 @@ class Model_nameserializers(serializers.ModelSerializer):
         return data
     
 # -------------- InstaUser Seriliser -----------------------
-from rest_framework import serializers
+from rest_framework import serializers  
+
+
 
 class InstaPostLikeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -43,7 +45,8 @@ class InstaPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = InstaPost
-        fields = ["id", "caption", "image", "likes", "total_likes"]
+        fields = ["caption", "image", "likes", "total_likes",'user']
+        read_only_fields = ['user']
    
 class InstaUserSerializer(serializers.ModelSerializer):
     posts = InstaPostSerializer(many=True, read_only=True)
@@ -54,10 +57,14 @@ class InstaUserSerializer(serializers.ModelSerializer):
         fields = "__all__"
         
 
-
-
 class loginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=50)
     password = serializers.CharField(max_length=50)
 
-        
+
+
+class DisplayDataSerializer(serializers.Serializer):
+    posts = InstaPostSerializer(many=True, read_only=True)
+    class Meta:
+        model = InstaUser
+        fields = ['username','posts']
