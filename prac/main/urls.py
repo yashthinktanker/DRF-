@@ -13,10 +13,16 @@ router.register('jwtgetmodel_name',views.jwtgetmodel_name,basename='jwtgetmodel_
 
 # Instagram
 router.register('Instauserview',views.Instauserview,basename='Instauserview')
+router.register('Regitration',views.Regitration,basename='Regitration')
+
+router.register('Displaydataview',views.Displaydataview,basename='Displaydataview')
+
 router.register('InstaPostview',views.InstaPostview,basename='InstaPostview')
 router.register('InstaPostLikeview',views.InstaPostLikeview,basename='InstaPostLikeview')
 router.register('LoginView',views.LoginView,basename='LoginView')
 router.register('LogoutView',views.LogoutView,basename='LogoutView')
+
+router.register('Otpverification',views.Otpverification,basename='Otpverification')
 
 
 

@@ -203,9 +203,26 @@ class Instauserview(viewsets.ModelViewSet):
 
         return InstaUser.objects.none()
 
+from rest_framework.exceptions import PermissionDenied
+
 class InstaPostview(viewsets.ModelViewSet):
-    queryset = InstaPost.objects.all()
     serializer_class = InstaPostSerializer
+    queryset = InstaPost.objects.all()
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+
+    def perform_create(self, serializer):
+        print("these functions")
+        user_id = self.request.session.get('username')
+
+        if not user_id:
+            raise PermissionDenied("Please login first")
+
+        serializer.save(user_id=user_id)    
+
+
+
 
 # class InstaPostLikeview(viewsets.ModelViewSet):
 #     queryset = InstaLike.objects.all()
@@ -218,6 +235,8 @@ class InstaPostLikeview(viewsets.ModelViewSet):
     queryset = InstaLike.objects.all()
     serializer_class = InstaPostLikeSerializer
 
+
+
     @action(detail=False, methods=['delete'])
     def delete_all(self,request):
         c=InstaLike.objects.all().delete()
@@ -226,32 +245,109 @@ class InstaPostLikeview(viewsets.ModelViewSet):
         })
     
 
+import random
+from django.core.mail import send_mail,EmailMessage
+from rest_framework.reverse import reverse
+
+from rest_framework_simplejwt.tokens import RefreshToken
 class LoginView(viewsets.ViewSet):
 
+    def list(self,request):
+        user = request.session.get('username',None)
+        if user:
+            return Response({"message": "ALready Login Pls logout"})
+        else:
+            return Response({"message": "Enter Username And Password"})
     def create(self, request):
+        user = request.session.get('username',None)
+        if user:
+            return Response({"message": "ALready Login Pls logout"})
+        
         username = request.data.get("username")
         password = request.data.get("password")
 
+        if not username and not password:
+            return Response({"message": "Enter Username And Password"})
+        if not username:
+            return Response({"message": "Enter Username "})
+        if not password:
+            return Response({"message": "Enter Password"})
+
+        
         try:
             user = InstaUser.objects.get(username=username)
         except InstaUser.DoesNotExist:
             return Response({"error": "Invalid Username"})
 
         if user.password == password:
-            request.session['username']=user.username
-            return Response({
-                "message": "Login successful",
-                "user_id": user.id
-            })
+            refresh = RefreshToken.for_user(user)
+            otp = str(random.randint(100000, 999999))
+            print('otp: ', otp)
+              # store OTP in session
+            request.session['otp'] = otp
+            request.session['username']=user.id
+            request.session.save()
+
+            EmailMessage(
+                "Your OTP",
+                f"Your login OTP is {otp}",
+                None,
+                [user.email],
+            ).send()
+            otp_url = reverse("Otpverification-list", request=request)
+            return Response({"message": "OTP sent to email",'url':otp_url,
+                             "refresh":str(refresh),
+                             "access":str(refresh.access_token)
+                             })
         else:
             return Response({"error": "Invalid Password"})
 
 
 
 class LogoutView(viewsets.ViewSet):
-      def create(self, request):
+      def list(self, request):
         if request.session.get('username'):
             del request.session['username']
             return Response({"message": "Logout successful"})
         else:
             return Response({"message": "pls Login"})
+
+
+
+class Otpverification(viewsets.ViewSet):
+    def list(self,request):
+        if not request.session.get('otp'):
+            return Response({"message": "Pls Login"})
+        else:
+            return Response({"message": "Enter Otp:"})
+    def create(self,request):
+        if request.session.get('otp'):
+            data=request.data
+            print('data: ', data['otp'])
+            otp = request.session['otp']
+            if str(otp) == str(data['otp']):
+                del request.session['otp']
+
+                return Response({"message": "LogIn successful",'login name':request.session['username']})
+            else:
+                return Response({"message": "Invalide OTP"})
+        else:
+            return Response({"message": "Pls Login"})
+        
+
+
+
+class Regitration(viewsets.ModelViewSet):
+    queryset = InstaUser.objects.all()
+    serializer_class = InstaUserSerializer
+    http_method_names = ['post']
+
+
+class Displaydataview(viewsets.ModelViewSet):
+    serializer_class = DisplayDataSerializer
+    def get_queryset(self):
+        username = self.request.session.get('username')
+        if username:
+            return InstaUser.objects.filter(Q(is_private=False) | Q(username=username))
+
+        return InstaUser.objects.none()
