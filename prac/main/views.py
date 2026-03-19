@@ -241,7 +241,7 @@ class InstaPostLikeview(viewsets.ModelViewSet):
     def delete_all(self,request):
         c=InstaLike.objects.all().delete()
         return Response ({
-            'message':f'all data is deletes{c}'
+            'message':f'all data is delete{c}'
         })
     
 
