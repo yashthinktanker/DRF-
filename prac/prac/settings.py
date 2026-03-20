@@ -29,7 +29,7 @@ DEBUG = False
 ALLOWED_HOSTS = ['*']
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-# Application definition
+# Application definition    
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -171,3 +171,6 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'yashdharvaparmarthinktanker@gmail.com'
 EMAIL_HOST_PASSWORD = 'rbkykrjdcqcccyrb'  
+
+# STATIC_URL = '/static/'
+# STATIC_ROOT = 'staticfiles'
