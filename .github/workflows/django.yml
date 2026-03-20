@@ -1,36 +1,37 @@
-name: Django CI
+ name: Django CI
 
-on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+  on:
+    push:
+      branches: ["main", "mybranch"]
+    pull_request:
+      branches: ["main", "mybranch"]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+  jobs:
+    test:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
 
-    strategy:
-      matrix:
-        python-version: [3.13, 3.13.12]
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: "3.13"
 
-    steps:
-      # 1. Checkout repository
-      - name: Checkout Code
-        uses: actions/checkout@v4
+        - name: Install dependencies
+          run: |
+            python -m pip install --upgrade pip
+            if [ -f requirements.txt ]; then
+              pip install -r requirements.txt
+            else
+              echo "requirements.txt not found. Add it at repo root or update the workflow."
+              exit 1
+            fi
 
-      # 2. Setup Python
-      - name: Setup Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: ${{ matrix.python-version }}
+        - name: Run migrations
+          run: |
+            python manage.py migrate
 
-      # 4. Run migrations
-      - name: Apply Migrations
-        run: |
-          python manage.py migrate
-
-      # 5. Run tests
-      - name: Run Tests
-        run: |
-          python manage.py test
+        - name: Run tests
+          run: |
+            python manage.py test
