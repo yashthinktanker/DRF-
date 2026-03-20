@@ -1,29 +1,35 @@
 name: Django CI
 
 on:
-    push:
-      branches: ["main", "master"]
-    pull_request:
-      branches: ["main", "master"]
+  push:
+    branches: ["main", "mybranch"]
+  pull_request:
+    branches: ["main", "mybranch"]
 
 jobs:
-    test:
-      runs-on: windows-latest
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+  test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-        - name: Set up Python
-          uses: actions/setup-python@v5
-          with:
-            python-version: "3.13"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
 
-        - name: Run migrations
-          working-directory: prac
-          run: |
-            python manage.py migrate
+      - name: Install dependencies
+        working-directory: prac
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-        - name: Run tests
-          working-directory: prac
-          run: |
-            python manage.py test
+      - name: Run migrations
+        working-directory: prac
+        run: |
+          python manage.py migrate
+
+      - name: Run tests
+        working-directory: prac
+        run: |
+          python manage.py test
