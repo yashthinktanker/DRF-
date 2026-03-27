@@ -351,3 +351,23 @@ class Displaydataview(viewsets.ModelViewSet):
             return InstaUser.objects.filter(Q(is_private=False) | Q(username=username))
 
         return InstaUser.objects.none()
+
+
+# from rest_framework import status
+# return Response({
+#         "status": True,
+#         "message": "User created successfully",
+#         "data": serializer.data
+#     }, status=status.HTTP_201_CREATED)
+
+
+# status=status.HTTP_200_OK
+# status=status.HTTP_201_CREATED
+# status=status.HTTP_400_BAD_REQUEST
+# status=status.HTTP_404_NOT_FOUND
+
+# GET → 200
+# POST → 201
+# PUT/PATCH → 200
+# DELETE → 204
+# Invalid data → 400

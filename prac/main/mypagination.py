@@ -24,4 +24,4 @@ class mypaginatior(PageNumberPagination):
 # class mypaginatior(CursorPagination):
 #     page_size = 2   
 #     ordering = '-id'
-#     cursor_query_param = 'cu'
+#     cursor_query_param = 'cu' 
